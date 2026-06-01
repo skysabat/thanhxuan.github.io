@@ -1,0 +1,1429 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Thanh Xuân Của Chúng Ta</title>
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --white: #ffffff;
+    --cream: rgba(255,255,255,0.92);
+    --accent: #e8c96d;
+    --nav-h: 70px;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Be Vietnam Pro', sans-serif;
+    background: #0a0a0a;
+    color: var(--white);
+    overflow-x: hidden;
+  }
+
+  /* MEMBERS LIGHT SECTION */
+  #members {
+    background: #f5f5f5;
+    color: #1a1a1a;
+    max-width: 100%;
+    padding: 5rem 3rem;
+  }
+  #members .section-title {
+    color: #1a1a1a;
+  }
+  #members .section-title::after {
+    background: #c0392b;
+  }
+
+  .members-photo-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2.8rem;
+    max-width: 1000px;
+    margin: 0 auto 2.5rem;
+  }
+  .member-photo-card {
+    background: #fff;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    transition: transform 0.3s, box-shadow 0.3s;
+    cursor: pointer;
+    position: relative;
+  }
+  .member-photo-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 32px rgba(0,0,0,0.15);
+  }
+
+  .member-hover-overlay {
+    position: absolute;
+    left: 0; right: 0; top: 0;
+    bottom: 42px;
+    background: rgba(0,0,0,0.35);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 1.2rem 1.2rem 1.8rem;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    text-align: center;
+  }
+  .member-photo-card:hover .member-hover-overlay { opacity: 1; }
+  .member-photo-card:hover .photo-placeholder {
+    filter: blur(3px);
+    transition: filter 0.3s ease;
+  }
+  .photo-placeholder { transition: filter 0.3s ease; }
+  .hover-quote {
+    font-family: 'Dancing Script', cursive;
+    font-size: 1.15rem;
+    color: rgba(255,255,255,0.95);
+    line-height: 1.5;
+    margin-bottom: 14px;
+    font-style: italic;
+    text-align: center;
+  }
+  .hover-detail {
+    font-size: 0.78rem;
+    color: rgba(255,255,255,0.85);
+    letter-spacing: 0.5px;
+    text-align: center;
+  }
+
+  #memberModal.open { display: flex !important; }
+  .member-modal-box {
+    background: #fff;
+    border-radius: 20px;
+    padding: 2rem;
+    width: 320px;
+    max-width: 90vw;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    animation: fadeUp 0.3s ease both;
+  }
+  .modal-avatar {
+    width: 90px; height: 90px;
+    border-radius: 18px;
+    background: linear-gradient(135deg, #c0392b, #8e1a10);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    border: 3px solid #e8e8f0;
+  }
+  .modal-name {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 4px;
+  }
+  .modal-nickname {
+    font-size: 0.9rem;
+    color: #2980b9;
+    font-weight: 700;
+    margin-bottom: 1.2rem;
+  }
+  .modal-divider {
+    width: 100%; height: 1px;
+    background: #f0f0f0;
+    margin-bottom: 1.2rem;
+  }
+  .modal-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    width: 100%;
+    margin-bottom: 0.8rem;
+    background: #f8f8fc;
+    border-radius: 12px;
+    padding: 0.8rem 1rem;
+  }
+  .modal-icon {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: #ede9fe;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .modal-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #aaa;
+    letter-spacing: 1px;
+    margin-bottom: 3px;
+  }
+  .modal-value { font-size: 0.92rem; color: #333; line-height: 1.5; }
+  .member-photo-card .photo {
+    width: 100%;
+    aspect-ratio: 4/5.2;
+    object-fit: cover;
+    display: block;
+    background: #ddd;
+  }
+  .member-photo-card .photo-placeholder {
+    width: 100%;
+    aspect-ratio: 4/5.2;
+    background: linear-gradient(160deg, #c0392b 0%, #8e1a10 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 4rem;
+  }
+  .member-photo-card .card-name {
+    padding: 1rem;
+    text-align: center;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    letter-spacing: 0.3px;
+    transition: opacity 0.2s;
+  }
+  .member-photo-card .card-nickname {
+    display: none;
+    padding: 1rem;
+    text-align: center;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #2980b9;
+    letter-spacing: 0.3px;
+    font-style: italic;
+  }
+  .member-photo-card:hover .card-name { display: none; }
+  .member-photo-card:hover .card-nickname { display: block; }
+
+  .member-photo-card.hidden-member { display: none; }
+  .member-photo-card.hidden-member.shown { display: block; }
+
+  .xem-them-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 auto;
+    padding: 12px 32px;
+    border: 1.5px solid #888;
+    border-radius: 50px;
+    background: transparent;
+    color: #444;
+    font-family: 'Be Vietnam Pro', sans-serif;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .xem-them-btn:hover { border-color: #333; color: #111; }
+  .xem-them-btn svg { transition: transform 0.3s; }
+  .xem-them-btn.expanded svg { transform: rotate(180deg); }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    height: var(--nav-h);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 3rem;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.65), transparent);
+    transition: background 0.4s;
+  }
+  nav.scrolled {
+    background: rgba(10,10,10,0.92);
+    backdrop-filter: blur(10px);
+  }
+  .logo {
+    font-family: 'Dancing Script', cursive;
+    font-size: 2rem;
+    color: var(--white);
+    text-decoration: none;
+    letter-spacing: 1px;
+  }
+  .nav-links {
+    display: flex;
+    gap: 2.2rem;
+    list-style: none;
+  }
+  .nav-links a {
+    color: rgba(255,255,255,0.85);
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 400;
+    letter-spacing: 0.5px;
+    transition: color 0.2s;
+    position: relative;
+  }
+  .nav-links a::after {
+    content: '';
+    position: absolute;
+    bottom: -4px; left: 0;
+    width: 0; height: 1.5px;
+    background: var(--accent);
+    transition: width 0.3s;
+  }
+  .nav-links a:hover { color: var(--white); }
+  .nav-links a:hover::after { width: 100%; }
+
+  /* HERO */
+  .hero {
+    position: relative;
+    height: 100vh;
+    min-height: 600px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    overflow: hidden;
+  }
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(to bottom, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0.45) 60%, rgba(0,0,0,0.7) 100%),
+      url('https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=1600&q=80') center/cover no-repeat;
+    transform: scale(1.05);
+    animation: zoomBg 18s ease-in-out infinite alternate;
+  }
+  @keyframes zoomBg {
+    from { transform: scale(1.05); }
+    to   { transform: scale(1.12); }
+  }
+  .hero-sun {
+    position: absolute;
+    top: 60px; right: 120px;
+    width: 90px; height: 90px;
+    opacity: 0.55;
+    animation: rotateSun 20s linear infinite;
+  }
+  @keyframes rotateSun { to { transform: rotate(360deg); } }
+  .hero-sun svg { width: 100%; height: 100%; }
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    padding: 0 1rem;
+    animation: fadeUp 1.2s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(40px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .hero h1 {
+    font-family: 'Dancing Script', cursive;
+    font-size: clamp(3rem, 8vw, 6.5rem);
+    color: var(--white);
+    line-height: 1.1;
+    text-shadow: 0 4px 30px rgba(0,0,0,0.5);
+    margin-bottom: 1.2rem;
+    animation: fadeUp 1.2s 0.15s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .hero p {
+    font-size: clamp(0.95rem, 2vw, 1.2rem);
+    color: rgba(255,255,255,0.88);
+    font-weight: 300;
+    letter-spacing: 0.5px;
+    margin-bottom: 2.5rem;
+    text-shadow: 0 2px 12px rgba(0,0,0,0.4);
+    animation: fadeUp 1.2s 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .hero-btn {
+    display: inline-block;
+    padding: 14px 36px;
+    background: rgba(255,255,255,0.18);
+    border: 1.5px solid rgba(255,255,255,0.6);
+    backdrop-filter: blur(8px);
+    color: var(--white);
+    font-family: 'Be Vietnam Pro', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    border-radius: 50px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.3s, border-color 0.3s, transform 0.2s;
+    animation: fadeUp 1.2s 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .hero-btn:hover {
+    background: rgba(255,255,255,0.28);
+    border-color: var(--white);
+    transform: translateY(-2px);
+  }
+  .scroll-hint {
+    position: absolute;
+    bottom: 2.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    z-index: 2;
+    animation: fadeUp 1.2s 0.6s both;
+  }
+  .scroll-hint span {
+    font-size: 0.7rem;
+    letter-spacing: 3px;
+    color: rgba(255,255,255,0.6);
+    text-transform: uppercase;
+  }
+  .scroll-mouse {
+    width: 26px; height: 42px;
+    border: 1.5px solid rgba(255,255,255,0.5);
+    border-radius: 14px;
+    position: relative;
+  }
+  .scroll-mouse::before {
+    content: '';
+    position: absolute;
+    top: 6px; left: 50%;
+    transform: translateX(-50%);
+    width: 3px; height: 7px;
+    background: rgba(255,255,255,0.7);
+    border-radius: 2px;
+    animation: scrollDot 1.8s ease-in-out infinite;
+  }
+  @keyframes scrollDot {
+    0%   { opacity: 1; top: 6px; }
+    80%  { opacity: 0; top: 22px; }
+    100% { opacity: 0; top: 6px; }
+  }
+
+  /* SECTIONS */
+  section {
+    padding: 6rem 3rem;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .section-title {
+    font-family: 'Dancing Script', cursive;
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 700;
+    color: var(--white);
+    text-align: center;
+    margin-bottom: 3rem;
+    position: relative;
+  }
+  .section-title::after {
+    content: '';
+    display: block;
+    width: 60px; height: 2px;
+    background: var(--accent);
+    margin: 0.6rem auto 0;
+    border-radius: 1px;
+  }
+
+  /* MOMENTS */
+  #moments {
+    background: #f5f5f5;
+    max-width: 100%;
+    padding: 5rem 2rem 4rem;
+  }
+  #moments .section-title {
+    color: #1a1a1a;
+    font-size: clamp(2.2rem, 5vw, 3.5rem);
+    margin-bottom: 0.5rem;
+  }
+  #moments .section-title::after {
+    background: linear-gradient(to right, #e07bac, #6ec6f5);
+    width: 80px; height: 3px;
+    border-radius: 2px;
+  }
+  .gallery-vertical {
+    max-width: 1100px;
+    margin: 2.5rem auto 0;
+    columns: 3;
+    column-gap: 12px;
+  }
+  @media (max-width: 700px) { .gallery-vertical { columns: 2; } }
+  .gallery-card {
+    break-inside: avoid;
+    margin-bottom: 12px;
+    border-radius: 14px;
+    overflow: hidden;
+    position: relative;
+    cursor: pointer;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+  .gallery-card:hover {
+    transform: scale(1.02);
+    box-shadow: 0 10px 28px rgba(0,0,0,0.18);
+  }
+  .gallery-card .img-ph {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    color: rgba(255,255,255,0.5);
+  }
+  .gallery-card:nth-child(1)  .img-ph { height:220px; background:linear-gradient(135deg,#2c3e50,#4a6741); }
+  .gallery-card:nth-child(2)  .img-ph { height:280px; background:linear-gradient(135deg,#c0392b,#8e1a10); }
+  .gallery-card:nth-child(3)  .img-ph { height:200px; background:linear-gradient(135deg,#8e1a10,#c0392b); }
+  .gallery-card:nth-child(4)  .img-ph { height:260px; background:linear-gradient(135deg,#7b2d8b,#c0392b); }
+  .gallery-card:nth-child(5)  .img-ph { height:200px; background:linear-gradient(135deg,#2c3e50,#7b2d8b); }
+  .gallery-card:nth-child(6)  .img-ph { height:240px; background:linear-gradient(135deg,#27ae60,#2c3e50); }
+  .gallery-card:nth-child(7)  .img-ph { height:210px; background:linear-gradient(135deg,#1a6b4a,#2c3e50); }
+  .gallery-card:nth-child(8)  .img-ph { height:270px; background:linear-gradient(135deg,#6b1a3a,#c0392b); }
+  .gallery-card:nth-child(9)  .img-ph { height:220px; background:linear-gradient(135deg,#2c3e50,#6b4a1a); }
+  .gallery-card:nth-child(10) .img-ph { height:250px; background:linear-gradient(135deg,#1a3a6b,#6b1a3a); }
+  .gallery-card:nth-child(11) .img-ph { height:200px; background:linear-gradient(135deg,#4a6b1a,#1a6b4a); }
+  .gallery-card:nth-child(12) .img-ph { height:260px; background:linear-gradient(135deg,#6b3a1a,#c0392b); }
+  .gallery-card .g-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0);
+    transition: background 0.3s;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .gallery-card:hover .g-overlay { background: rgba(0,0,0,0.22); }
+  .gallery-card .g-overlay-icon { opacity:0; font-size:2rem; transition:opacity 0.3s; }
+  .gallery-card:hover .g-overlay-icon { opacity:1; }
+  .gallery-card.g-hidden { display: none; }
+  .gallery-card.g-hidden.g-shown { display: block; }
+  .gallery-loadmore-wrap { text-align: center; margin-top: 2rem; }
+
+  /* Lightbox */
+  .lightbox {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.92);
+    z-index: 999;
+    align-items: center;
+    justify-content: center;
+  }
+  .lightbox.open { display: flex; }
+  .lightbox-inner {
+    max-width: 80vw;
+    max-height: 80vh;
+    position: relative;
+  }
+  .lightbox-inner .img-placeholder {
+    width: 70vw; height: 60vh;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 5rem;
+    border-radius: 8px;
+  }
+  .lightbox-close {
+    position: absolute;
+    top: -40px; right: 0;
+    background: none; border: none;
+    color: white; font-size: 1.8rem;
+    cursor: pointer;
+    line-height: 1;
+  }
+
+  /* ============================================
+     TIMELINE - LIGHT BACKGROUND (giống ảnh)
+     ============================================ */
+  #timeline {
+    background: #f5f5f5;
+    max-width: 100%;
+    padding: 5rem 3rem;
+  }
+
+  /* Override section-title cho timeline: chữ tối */
+  #timeline .section-title {
+    color: #2a2a2a !important;
+    -webkit-text-stroke: 2px #2a2a2a !important;
+  }
+  #timeline .section-title::after {
+    background: linear-gradient(to right, #c0a0e0, #6ec6f5);
+    width: 80px; height: 3px;
+  }
+
+  .timeline {
+    position: relative;
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 2rem 0 3rem;
+  }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 0; bottom: 0;
+    width: 2px;
+    background: linear-gradient(to bottom, transparent, #b0b8cc 10%, #b0b8cc 90%, transparent);
+  }
+  .tl-item {
+    position: relative;
+    display: flex;
+    justify-content: flex-end;
+    padding: 0 calc(50% + 36px) 2.8rem 0;
+  }
+  .tl-item:nth-child(even) {
+    justify-content: flex-start;
+    padding: 0 0 2.8rem calc(50% + 36px);
+  }
+  .tl-item::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 18px;
+    transform: translateX(-50%);
+    width: 13px; height: 13px;
+    border-radius: 50%;
+    background: #fff;
+    border: 2px solid #8899bb;
+    z-index: 1;
+  }
+  .tl-card {
+    background: #fff;
+    border-radius: 14px;
+    padding: 1.2rem 1.4rem;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.09);
+    max-width: 340px;
+    width: 100%;
+    text-align: right;
+  }
+  .tl-item:nth-child(even) .tl-card { text-align: left; }
+  .tl-year {
+    font-size: 0.82rem;
+    color: #7b9bbf;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.35rem;
+    font-weight: 600;
+  }
+  .tl-title {
+    font-family: 'Dancing Script', cursive;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin-bottom: 0.4rem;
+  }
+  .tl-desc {
+    font-size: 0.85rem;
+    color: #555;
+    line-height: 1.65;
+  }
+  .tl-item.tl-hidden { display: none; }
+  .tl-item.tl-hidden.tl-shown {
+    display: flex;
+    animation: fadeUp 0.5s ease both;
+  }
+  @media (max-width: 640px) {
+    .timeline::before { left: 18px; }
+    .tl-item, .tl-item:nth-child(even) {
+      justify-content: flex-start;
+      padding: 0 0 2rem 48px;
+    }
+    .tl-item::after { left: 18px; top: 14px; }
+    .tl-card { text-align: left; max-width: 100%; }
+  }
+
+  /* "Xem thêm" button bên trong timeline - màu tối */
+  #timeline .xem-them-btn {
+    color: #444;
+    border-color: #888;
+  }
+
+  /* NOTES */
+  #notes {
+    background: #f0f0f0;
+    max-width: 100%;
+    padding: 5rem 2rem 4rem;
+  }
+  #notes .section-title { color: #1a1a1a; }
+  #notes .section-title::after { background: #c0a0e0; }
+
+  .notes-wrapper {
+    max-width: 1100px;
+    margin: 2.5rem auto 0;
+    overflow: hidden;
+    max-height: 420px;
+    transition: max-height 0.7s ease;
+    position: relative;
+  }
+  .notes-wrapper.expanded { max-height: 1200px; }
+  .notes-wrapper:not(.expanded)::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 120px;
+    background: linear-gradient(to bottom, transparent, #f0f0f0);
+    pointer-events: none;
+  }
+  .notes-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 20px;
+    margin-bottom: 20px;
+  }
+  @media (max-width: 900px) { .notes-grid { grid-template-columns: repeat(3,1fr); } }
+  @media (max-width: 560px) { .notes-grid { grid-template-columns: repeat(2,1fr); } }
+  .sticky-note {
+    position: relative;
+    border-radius: 4px;
+    padding: 2rem 1.2rem 1.5rem;
+    min-height: 180px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: 3px 4px 14px rgba(0,0,0,0.13), 0 1px 3px rgba(0,0,0,0.08);
+    transition: transform 0.3s, box-shadow 0.3s;
+    cursor: default;
+  }
+  .sticky-note:hover {
+    transform: translateY(-5px) rotate(0deg);
+    box-shadow: 6px 10px 24px rgba(0,0,0,0.18);
+    z-index: 2;
+  }
+  .sticky-note:nth-child(5n+1) { transform: rotate(-2deg); }
+  .sticky-note:nth-child(5n+2) { transform: rotate(2deg); }
+  .sticky-note:nth-child(5n+3) { transform: rotate(-1deg); }
+  .sticky-note:nth-child(5n+4) { transform: rotate(3deg); }
+  .sticky-note:nth-child(5n+5) { transform: rotate(-2.5deg); }
+  .sticky-note:hover { transform: translateY(-5px) rotate(0deg) !important; }
+  .sticky-note::before {
+    content: '📌';
+    position: absolute;
+    top: 6px; right: 10px;
+    font-size: 1rem;
+    opacity: 0.55;
+  }
+  .sticky-note.c1 { background: #e8c8f0; }
+  .sticky-note.c2 { background: #f8c8d8; }
+  .sticky-note.c3 { background: #f8e0a0; }
+  .sticky-note.c4 { background: #b8e8f8; }
+  .sticky-note.c5 { background: #c8f0d8; }
+  .sticky-note.c6 { background: #f8d0b8; }
+  .sticky-note .note-text {
+    font-family: 'Dancing Script', cursive;
+    font-size: 1.05rem;
+    color: #3a3a3a;
+    line-height: 1.7;
+    flex: 1;
+    font-style: italic;
+  }
+  .sticky-note .note-author {
+    font-family: 'Dancing Script', cursive;
+    font-size: 0.95rem;
+    color: #555;
+    text-align: right;
+    margin-top: 1rem;
+    font-style: italic;
+  }
+  .xem-link-goc-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 22px;
+    background: #e8a020;
+    color: #fff;
+    font-family: 'Be Vietnam Pro', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 500;
+    border-radius: 50px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+    box-shadow: 0 2px 10px rgba(232,160,32,0.35);
+  }
+  .xem-link-goc-btn:hover { background: #cf8c10; transform: translateY(-2px); }
+  .sticky-note.note-hidden { display: none; }
+  .sticky-note.note-hidden.note-shown {
+    display: flex;
+    animation: fadeUp 0.4s ease both;
+  }
+
+  /* FOOTER */
+  footer {
+    text-align: center;
+    padding: 3rem 1rem;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    color: rgba(255,255,255,0.4);
+    font-size: 0.8rem;
+    letter-spacing: 0.5px;
+  }
+  footer .logo-footer {
+    font-family: 'Dancing Script', cursive;
+    font-size: 1.8rem;
+    color: rgba(255,255,255,0.7);
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+
+  .full-divider {
+    width: 100%; height: 1px;
+    background: linear-gradient(to right, transparent, rgba(255,255,255,0.1), transparent);
+    margin: 0;
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: none;
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="navbar">
+  <a href="#" class="logo">Thanh Xuân</a>
+  <ul class="nav-links">
+    <li><a href="#home">Trang chủ</a></li>
+    <li><a href="#members">Thành viên</a></li>
+    <li><a href="#moments">Khoảnh khắc</a></li>
+    <li><a href="#timeline">Dòng thời gian</a></li>
+    <li><a href="#notes">Lưu bút</a></li>
+    <li><button onclick="mpOpen()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:inherit;color:inherit;padding:0;">Nhạc</button></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="home">
+  <div class="hero-bg"></div>
+  <div class="hero-sun">
+    <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="50" cy="50" r="20" fill="white" opacity="0.9"/>
+      <g stroke="white" stroke-width="2.5" stroke-linecap="round" opacity="0.75">
+        <line x1="50" y1="5"  x2="50" y2="18"/>
+        <line x1="50" y1="82" x2="50" y2="95"/>
+        <line x1="5"  y1="50" x2="18" y2="50"/>
+        <line x1="82" y1="50" x2="95" y2="50"/>
+        <line x1="18.6" y1="18.6" x2="27.9" y2="27.9"/>
+        <line x1="72.1" y1="72.1" x2="81.4" y2="81.4"/>
+        <line x1="81.4" y1="18.6" x2="72.1" y2="27.9"/>
+        <line x1="27.9" y1="72.1" x2="18.6" y2="81.4"/>
+      </g>
+    </svg>
+  </div>
+  <div class="hero-content">
+    <h1 style="-webkit-text-stroke: 2px #ffffff; font-weight:700;">Thanh Xuân Của Chúng Ta</h1>
+    <p>"Những năm tháng rực rỡ dưới mái trường thân yêu"</p>
+    <a href="#members" class="hero-btn">Khám phá kỷ niệm</a>
+  </div>
+</section>
+
+<div class="full-divider"></div>
+
+<!-- MEMBERS -->
+<section id="members">
+  <h2 class="section-title reveal" style="font-weight:700; color:#2a2a2a; font-size:clamp(2.5rem, 5vw, 3.8rem); -webkit-text-stroke: 2px #2a2a2a;">Thành Viên</h2>
+  <div class="members-photo-grid reveal" id="membersGrid">
+    <div class="member-photo-card" onclick="openMemberModal(this)"
+      data-name="Hoàng Dũng" data-nickname="Dũng Đen" data-quote="Học không chơi đánh rơi tuổi trẻ."
+      data-hobbies="Bóng đá, nghe nhạc" data-desc="Lớp trưởng năng nổ, luôn sẵn sàng giúp đỡ mọi người." data-message="Hẹn gặp lại ở đại học!">
+      <div class="photo-placeholder">🎓</div>
+      <div class="member-hover-overlay">
+        <div class="hover-quote">"Học không chơi đánh rơi tuổi trẻ."</div>
+        <div class="hover-detail">Xem chi tiết →</div>
+      </div>
+      <div class="card-name">Hoàng Dũng</div><div class="card-nickname">Dũng Đen</div>
+    </div>
+    <div class="member-photo-card" onclick="openMemberModal(this)"
+      data-name="Đỗ Hải" data-nickname="Hải Còm" data-quote="Ngủ là đam mê, thức là nghĩa vụ."
+      data-hobbies="Game, đọc truyện" data-desc="Chàng trai trầm lặng nhưng cực kỳ hài hước." data-message="Chúc cả lớp thành công!">
+      <div class="photo-placeholder">🎓</div>
+      <div class="member-hover-overlay">
+        <div class="hover-quote">"Ngủ là đam mê, thức là nghĩa vụ."</div>
+        <div class="hover-detail">Xem chi tiết →</div>
+      </div>
+      <div class="card-name">Đỗ Hải</div><div class="card-nickname">Hải Còm</div>
+    </div>
+    <div class="member-photo-card" onclick="openMemberModal(this)"
+      data-name="Bảo Thy" data-nickname="Thy Béo" data-quote="Ăn no rồi tính."
+      data-hobbies="Nấu ăn, xem phim" data-desc="Luôn mang theo đồ ăn cho cả lớp mỗi ngày." data-message="Nhớ mãi những ngày bên nhau nhé!">
+      <div class="photo-placeholder">🎓</div>
+      <div class="member-hover-overlay">
+        <div class="hover-quote">"Ăn no rồi tính."</div>
+        <div class="hover-detail">Xem chi tiết →</div>
+      </div>
+      <div class="card-name">Bảo Thy</div><div class="card-nickname">Thy Béo</div>
+    </div>
+    <div class="member-photo-card hidden-member" onclick="openMemberModal(this)"
+      data-name="Minh Tú" data-nickname="Tú Mập" data-quote="Cười lên đi, cuộc đời ngắn lắm."
+      data-hobbies="Ca hát, nhảy" data-desc="Linh hồn của các buổi văn nghệ lớp." data-message="Giữ mãi nụ cười nhé mọi người!">
+      <div class="photo-placeholder">🎓</div>
+      <div class="member-hover-overlay">
+        <div class="hover-quote">"Cười lên đi, cuộc đời ngắn lắm."</div>
+        <div class="hover-detail">Xem chi tiết →</div>
+      </div>
+      <div class="card-name">Minh Tú</div><div class="card-nickname">Tú Mập</div>
+    </div>
+    <div class="member-photo-card hidden-member" onclick="openMemberModal(this)"
+      data-name="Thu Ngân" data-nickname="Lụm" data-quote="Cafe là động lực sống."
+      data-hobbies="Cafe, nghe nhạc" data-desc="Không có cafe thì không có Thu Ngân." data-message="Hẹn gặp lại ở đại học.">
+      <div class="photo-placeholder">🎓</div>
+      <div class="member-hover-overlay">
+        <div class="hover-quote">"Cafe là động lực sống."</div>
+        <div class="hover-detail">Xem chi tiết →</div>
+      </div>
+      <div class="card-name">Thu Ngân</div><div class="card-nickname">Lụm</div>
+    </div>
+    <div class="member-photo-card hidden-member" onclick="openMemberModal(this)"
+      data-name="Quốc Bảo" data-nickname="Bảo Lùn" data-quote="Thấp nhưng chí cao."
+      data-hobbies="Bóng rổ, âm nhạc" data-desc="Người nhỏ nhưng tinh thần lớn nhất lớp." data-message="Cố lên nhé mọi người!">
+      <div class="photo-placeholder">🎓</div>
+      <div class="member-hover-overlay">
+        <div class="hover-quote">"Thấp nhưng chí cao."</div>
+        <div class="hover-detail">Xem chi tiết →</div>
+      </div>
+      <div class="card-name">Quốc Bảo</div><div class="card-nickname">Bảo Lùn</div>
+    </div>
+    <div class="member-photo-card hidden-member" onclick="openMemberModal(this)"
+      data-name="Lan Anh" data-nickname="Anh Chanh" data-quote="Xinh thì phải biết mình xinh."
+      data-hobbies="Thời trang, chụp ảnh" data-desc="Fashionista của lớp, luôn mặc đẹp nhất." data-message="Mãi yêu lớp mình!">
+      <div class="photo-placeholder">🎓</div>
+      <div class="member-hover-overlay">
+        <div class="hover-quote">"Xinh thì phải biết mình xinh."</div>
+        <div class="hover-detail">Xem chi tiết →</div>
+      </div>
+      <div class="card-name">Lan Anh</div><div class="card-nickname">Anh Chanh</div>
+    </div>
+    <div class="member-photo-card hidden-member" onclick="openMemberModal(this)"
+      data-name="Văn Khoa" data-nickname="Khoa Cò" data-quote="Học đi, lo gì."
+      data-hobbies="Đọc sách, lập trình" data-desc="Thủ khoa tiềm năng của lớp." data-message="Gặp lại ở đỉnh vinh quang nhé!">
+      <div class="photo-placeholder">🎓</div>
+      <div class="member-hover-overlay">
+        <div class="hover-quote">"Học đi, lo gì."</div>
+        <div class="hover-detail">Xem chi tiết →</div>
+      </div>
+      <div class="card-name">Văn Khoa</div><div class="card-nickname">Khoa Cò</div>
+    </div>
+    <div class="member-photo-card hidden-member" onclick="openMemberModal(this)"
+      data-name="Phương Linh" data-nickname="Linh Nhỏ" data-quote="Nhỏ người nhưng không nhỏ chí."
+      data-hobbies="Vẽ, nghe nhạc" data-desc="Họa sĩ bất đắc dĩ của lớp, vẽ đẹp nhất." data-message="Hẹn gặp lại và cùng nhau thành công!">
+      <div class="photo-placeholder">🎓</div>
+      <div class="member-hover-overlay">
+        <div class="hover-quote">"Nhỏ người nhưng không nhỏ chí."</div>
+        <div class="hover-detail">Xem chi tiết →</div>
+      </div>
+      <div class="card-name">Phương Linh</div><div class="card-nickname">Linh Nhỏ</div>
+    </div>
+  </div>
+  <div style="text-align:center;">
+    <button class="xem-them-btn" id="xemThemBtn" onclick="toggleMembers()">
+      Xem thêm
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+  </div>
+</section>
+
+<!-- MEMBER MODAL -->
+<div id="memberModal" onclick="closeMemberModal(event)" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:200; align-items:center; justify-content:center; backdrop-filter:blur(4px);">
+  <div class="member-modal-box" onclick="event.stopPropagation()">
+    <button onclick="closeMemberModal()" style="position:absolute; top:14px; right:16px; background:none; border:none; font-size:1.3rem; color:#aaa; cursor:pointer; line-height:1;">×</button>
+    <div class="modal-avatar" id="modalAvatar">🎓</div>
+    <div class="modal-name" id="modalName"></div>
+    <div class="modal-nickname" id="modalNickname"></div>
+    <div class="modal-divider"></div>
+    <div class="modal-row">
+      <span class="modal-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="#a78bfa" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+        </svg>
+      </span>
+      <div><div class="modal-label">SỞ THÍCH:</div><div class="modal-value" id="modalHobbies"></div></div>
+    </div>
+    <div class="modal-row">
+      <span class="modal-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+        </svg>
+      </span>
+      <div><div class="modal-label">LỜI NHẮN:</div><div class="modal-value" id="modalMessage"></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="full-divider"></div>
+
+<!-- KHOẢNH KHẮC -->
+<section id="moments">
+  <h2 class="section-title reveal" style="font-weight:700; color:#2a2a2a; font-size:clamp(2.5rem, 5vw, 3.8rem); -webkit-text-stroke: 2px #2a2a2a;">Khoảnh Khắc Đáng Nhớ</h2>
+  <div class="gallery-vertical reveal" id="galleryGrid">
+    <div class="gallery-card" onclick="openLightbox2(this)">
+      <div class="img-ph">📸</div>
+      <div class="g-overlay"><span class="g-overlay-icon">🔍</span></div>
+    </div>
+    <div class="gallery-card" onclick="openLightbox2(this)">
+      <div class="img-ph">🎭</div>
+      <div class="g-overlay"><span class="g-overlay-icon">🔍</span></div>
+    </div>
+    <div class="gallery-card" onclick="openLightbox2(this)">
+      <div class="img-ph">👘</div>
+      <div class="g-overlay"><span class="g-overlay-icon">🔍</span></div>
+    </div>
+    <div class="gallery-card" onclick="openLightbox2(this)">
+      <div class="img-ph">🎓</div>
+      <div class="g-overlay"><span class="g-overlay-icon">🔍</span></div>
+    </div>
+    <div class="gallery-card" onclick="openLightbox2(this)">
+      <div class="img-ph">💐</div>
+      <div class="g-overlay"><span class="g-overlay-icon">🔍</span></div>
+    </div>
+    <div class="gallery-card" onclick="openLightbox2(this)">
+      <div class="img-ph">🌸</div>
+      <div class="g-overlay"><span class="g-overlay-icon">🔍</span></div>
+    </div>
+    <div class="gallery-card g-hidden" onclick="openLightbox2(this)">
+      <div class="img-ph">🌺</div>
+      <div class="g-overlay"><span class="g-overlay-icon">🔍</span></div>
+    </div>
+    <div class="gallery-card g-hidden" onclick="openLightbox2(this)">
+      <div class="img-ph">🎊</div>
+      <div class="g-overlay"><span class="g-overlay-icon">🔍</span></div>
+    </div>
+    <div class="gallery-card g-hidden" onclick="openLightbox2(this)">
+      <div class="img-ph">🎒</div>
+      <div class="g-overlay"><span class="g-overlay-icon">🔍</span></div>
+    </div>
+    <div class="gallery-card g-hidden" onclick="openLightbox2(this)">
+      <div class="img-ph">🏫</div>
+      <div class="g-overlay"><span class="g-overlay-icon">🔍</span></div>
+    </div>
+    <div class="gallery-card g-hidden" onclick="openLightbox2(this)">
+      <div class="img-ph">🌻</div>
+      <div class="g-overlay"><span class="g-overlay-icon">🔍</span></div>
+    </div>
+    <div class="gallery-card g-hidden" onclick="openLightbox2(this)">
+      <div class="img-ph">🎵</div>
+      <div class="g-overlay"><span class="g-overlay-icon">🔍</span></div>
+    </div>
+  </div>
+  <div class="gallery-loadmore-wrap">
+    <button class="xem-them-btn" id="galleryMoreBtn" onclick="toggleGalleryMore()">
+      Xem thêm
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+  </div>
+</section>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <div class="lightbox-inner" onclick="event.stopPropagation()">
+    <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+    <div class="img-placeholder" id="lightboxContent" style="background:linear-gradient(135deg,#2c3e50,#c0392b);">📸</div>
+  </div>
+</div>
+
+<!-- TIMELINE - nền sáng, chữ tối -->
+<section id="timeline">
+  <h2 class="section-title reveal" style="font-weight:700; font-size:clamp(2.5rem, 5vw, 3.8rem);">Dòng Thời Gian</h2>
+  <div class="timeline reveal">
+    <div class="tl-item">
+      <div class="tl-card">
+        <div class="tl-year">Tháng 8, 2024</div>
+        <div class="tl-title">Ngày Tựu Trường</div>
+        <div class="tl-desc">Gặp lại bạn bè sau kỳ nghỉ hè, những câu chuyện chưa kể và tiếng cười rộn ràng khắp sân trường.</div>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-card">
+        <div class="tl-year">Tháng 9, 2024</div>
+        <div class="tl-title">Ngày Khai Giảng</div>
+        <div class="tl-desc">Lễ khai giảng năm học cuối cùng, tiếng trống trường vang lên lần nữa với bao cảm xúc khó tả.</div>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-card">
+        <div class="tl-year">Tháng 10, 2024</div>
+        <div class="tl-title">Ngày Nhà Giáo Việt Nam</div>
+        <div class="tl-desc">Buổi lễ tri ân thầy cô đầy xúc động, những bài hát và lời cảm ơn chân thành từ trái tim.</div>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-card">
+        <div class="tl-year">Tháng 12, 2024</div>
+        <div class="tl-title">Liên Hoan Cuối Năm</div>
+        <div class="tl-desc">Bữa tiệc tất niên ấm cúng, những tiết mục văn nghệ bất ngờ và khoảnh khắc cùng đón năm mới.</div>
+      </div>
+    </div>
+    <div class="tl-item tl-hidden">
+      <div class="tl-card">
+        <div class="tl-year">Tháng 1, 2025</div>
+        <div class="tl-title">Chuyến Dã Ngoại</div>
+        <div class="tl-desc">Cả lớp cùng nhau khám phá thiên nhiên, những trò chơi đồng đội và bữa cơm dã ngoại đầy tiếng cười.</div>
+      </div>
+    </div>
+    <div class="tl-item tl-hidden">
+      <div class="tl-card">
+        <div class="tl-year">Tháng 3, 2025</div>
+        <div class="tl-title">Ôn Thi Căng Thẳng</div>
+        <div class="tl-desc">Những đêm thức khuya ôn thi, áp lực nhưng luôn có nhau kề bên động viên cùng vượt qua.</div>
+      </div>
+    </div>
+    <div class="tl-item tl-hidden">
+      <div class="tl-card">
+        <div class="tl-year">Tháng 5, 2025</div>
+        <div class="tl-title">Kỳ Thi Tốt Nghiệp</div>
+        <div class="tl-desc">Áp lực, nước mắt và cả niềm vui – tất cả đều được chia sẻ cùng nhau trong kỳ thi quan trọng nhất.</div>
+      </div>
+    </div>
+    <div class="tl-item tl-hidden">
+      <div class="tl-card">
+        <div class="tl-year">Tháng 6, 2025</div>
+        <div class="tl-title">Lễ Tổng Kết &amp; Chia Tay</div>
+        <div class="tl-desc">Bộ đồng phục trắng tinh, nụ cười rạng rỡ và lời hứa sẽ không bao giờ quên nhau — thanh xuân đẹp nhất.</div>
+      </div>
+    </div>
+  </div>
+  <div style="text-align:center; margin-top:2rem;">
+    <button class="xem-them-btn" id="tlMoreBtn" onclick="toggleTimeline()">
+      Xem thêm
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+  </div>
+</section>
+
+<div class="full-divider"></div>
+
+<!-- FILM -->
+<div class="full-divider"></div>
+<section id="film" style="background:#f5f5f5; max-width:100%; padding:5rem 3rem;">
+  <h2 class="section-title reveal" style="font-weight:700; color:#2a2a2a; font-size:clamp(2.5rem, 5vw, 3.8rem); -webkit-text-stroke: 2px #2a2a2a;">Phim Ngắn Kỷ Niệm</h2>
+  <style>
+    #film .section-title::after {
+      background: linear-gradient(to right, #c0a0e0, #6ec6f5);
+      width: 80px; height: 3px;
+    }
+    .film-player {
+      max-width: 1100px;
+      margin: 2.5rem auto 0;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.25);
+      background: #000;
+      aspect-ratio: 16/9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      cursor: pointer;
+    }
+    .film-player iframe { width: 100%; height: 100%; border: none; display: block; }
+    .film-placeholder {
+      width: 100%; height: 100%;
+      background: #111;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 1rem;
+      color: rgba(255,255,255,0.5);
+      font-size: 0.9rem; letter-spacing: 1px;
+    }
+    .film-play-btn {
+      width: 72px; height: 72px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.15);
+      border: 2px solid rgba(255,255,255,0.4);
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.3s, transform 0.2s;
+    }
+    .film-player:hover .film-play-btn { background: rgba(255,255,255,0.25); transform: scale(1.08); }
+    .film-caption { text-align: center; margin-top: 1.2rem; font-size: 0.88rem; color: #888; letter-spacing: 0.5px; }
+  </style>
+  <div class="film-player reveal">
+    <div class="film-placeholder">
+      <div class="film-play-btn">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+          <polygon points="10,6 24,14 10,22" fill="rgba(255,255,255,0.85)"/>
+        </svg>
+      </div>
+      <span>Thêm link video vào đây</span>
+    </div>
+  </div>
+  <p class="film-caption reveal">Những khoảnh khắc đáng nhớ nhất của lớp — được lưu lại mãi mãi 🎬</p>
+</section>
+
+<div class="full-divider"></div>
+
+<!-- NOTES -->
+<section id="notes">
+  <h2 class="section-title reveal" style="font-weight:700; color:#2a2a2a; font-size:clamp(2.5rem, 5vw, 3.8rem); -webkit-text-stroke: 2px #2a2a2a;">Những Lời Nhắn Nhủ</h2>
+  <style>
+    #notes .section-title::after {
+      background: linear-gradient(to right, #c0a0e0, #6ec6f5);
+      width: 80px; height: 3px;
+      border-radius: 2px;
+    }
+  </style>
+  <div class="notes-wrapper reveal">
+    <div class="notes-grid">
+      <div class="sticky-note c4">
+        <div class="note-text">Cố lên nhé mọi người, chúc mọi người thi tốt!</div>
+        <div class="note-author">– Thu Ngân</div>
+      </div>
+      <div class="sticky-note c1">
+        <div class="note-text">Có thể không đồng hành cùng với nhau... nhưng chúng ta đã là một phần trong ký ức của nhau</div>
+        <div class="note-author">– Tuấn Kiệt</div>
+      </div>
+      <div class="sticky-note c1" style="background:#c8b8e8;">
+        <div class="note-text">Mong sao tương lai chúng ta có thể gặp lại nhau, chúc mọi người thi tốt!</div>
+        <div class="note-author">– Thanh Thái</div>
+      </div>
+      <div class="sticky-note c3">
+        <div class="note-text">Hẹn gặp lại ở đỉnh vinh quang nhé, tui hy vọng mọi người sẽ thành công trên con đường mình đã chọn</div>
+        <div class="note-author">– Hồng Dung</div>
+      </div>
+      <div class="sticky-note c3">
+        <div class="note-text">Chúc chúng ta sau này vẫn giữ được nụ cười như những ngày còn ngồi chung lớp</div>
+        <div class="note-author">– Gia Huy</div>
+      </div>
+      <div class="sticky-note c2">
+        <div class="note-text">Dù đi đâu, làm gì, mình vẫn luôn tự hào là một người bạn của lớp mình.</div>
+        <div class="note-author">– Minh Tú</div>
+      </div>
+      <div class="sticky-note c1" style="background:#f8c8e8;">
+        <div class="note-text">Thanh xuân là những ngày tháng đẹp nhất bên nhau.</div>
+        <div class="note-author">– Lan Anh</div>
+      </div>
+      <div class="sticky-note c6">
+        <div class="note-text">Sau này có một mái ấm rồi đừng quên rủ tụi mình đến chơi nhé!</div>
+        <div class="note-author">– Văn Khoa</div>
+      </div>
+      <div class="sticky-note c5">
+        <div class="note-text">Cảm ơn vì đã xuất hiện trong thanh xuân của mình.</div>
+        <div class="note-author">– Phương Linh</div>
+      </div>
+      <div class="sticky-note c3">
+        <div class="note-text">Mãi biết ơn những ngày tháng đẹp bên nhau.</div>
+        <div class="note-author">– Bảo Thy</div>
+      </div>
+    </div>
+    <div class="notes-grid notes-extra" id="notesExtra" style="display:none;">
+      <div class="sticky-note c1">
+        <div class="note-text">Chúc cả lớp thi tốt nhé! Đỗ nguyện vọng 1 nhé</div>
+        <div class="note-author">– An Bình</div>
+      </div>
+      <div class="sticky-note c4">
+        <div class="note-text">Mãi nhớ những ngày đi học quân sự, anh em mãi đỉnh!</div>
+        <div class="note-author">– Minh Bảo</div>
+      </div>
+      <div class="sticky-note c2">
+        <div class="note-text">Hãy sống một cuộc đời rực rỡ nhé! Đừng quên nhau nhé</div>
+        <div class="note-author">– Lê Chi</div>
+      </div>
+      <div class="sticky-note c5">
+        <div class="note-text">Những kỷ niệm bên nhau sẽ mãi là hành trang quý giá nhất.</div>
+        <div class="note-author">– Thanh Hà</div>
+      </div>
+      <div class="sticky-note c1" style="background:#c8b8e8;">
+        <div class="note-text">Cảm ơn các bạn đã là một phần thanh xuân tươi đẹp nhất của mình!</div>
+        <div class="note-author">– Hoàng Dũng</div>
+      </div>
+    </div>
+  </div>
+  <div style="text-align:center;margin-top:2rem;">
+    <button class="xem-them-btn" id="notesMoreBtn" onclick="toggleNotes()" style="border-color:#aaa;color:#444;">
+      Xem thêm
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <span class="logo-footer">Thanh Xuân</span>
+  <span>© 2024 · Thanh Xuân Của Chúng Ta · Lưu giữ những kỷ niệm đẹp nhất</span>
+</footer>
+
+<script>
+  function openMemberModal(card) {
+    document.getElementById('modalName').textContent = card.dataset.name;
+    document.getElementById('modalNickname').textContent = card.dataset.nickname;
+    document.getElementById('modalHobbies').textContent = card.dataset.hobbies;
+    document.getElementById('modalMessage').textContent = card.dataset.message;
+    const modal = document.getElementById('memberModal');
+    modal.classList.add('open');
+    modal.style.display = 'flex';
+  }
+  function closeMemberModal(e) {
+    if (!e || e.target === document.getElementById('memberModal')) {
+      const modal = document.getElementById('memberModal');
+      modal.classList.remove('open');
+      modal.style.display = 'none';
+    }
+  }
+  document.addEventListener('keydown', e => { if(e.key==='Escape') closeMemberModal(); });
+
+  const nav = document.getElementById('navbar');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 60);
+  });
+
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); }
+    });
+  }, { threshold: 0.15 });
+  reveals.forEach(el => observer.observe(el));
+
+  function openLightbox2(el) {
+    const ph = el.querySelector('.img-ph').cloneNode(true);
+    const lb = document.getElementById('lightboxContent');
+    lb.replaceWith(ph);
+    ph.id = 'lightboxContent';
+    ph.style.cssText = 'width:70vw;height:60vh;display:flex;align-items:center;justify-content:center;font-size:5rem;border-radius:8px;';
+    document.getElementById('lightbox').classList.add('open');
+  }
+  function closeLightbox() { document.getElementById('lightbox').classList.remove('open'); }
+  document.addEventListener('keydown', e => { if(e.key==='Escape') closeLightbox(); });
+
+  function toggleGalleryMore() {
+    const hidden = document.querySelectorAll('.g-hidden');
+    const btn = document.getElementById('galleryMoreBtn');
+    const expanded = btn.classList.contains('expanded');
+    hidden.forEach(el => el.classList.toggle('g-shown', !expanded));
+    btn.classList.toggle('expanded', !expanded);
+    btn.innerHTML = expanded
+      ? 'Xem thêm <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+      : 'Thu gọn <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    if (expanded) document.getElementById('moments').scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function toggleNotes() {
+    const wrapper = document.querySelector('.notes-wrapper');
+    const extra = document.getElementById('notesExtra');
+    const btn = document.getElementById('notesMoreBtn');
+    const expanded = btn.classList.contains('expanded');
+    wrapper.classList.toggle('expanded', !expanded);
+    extra.style.display = !expanded ? 'grid' : 'none';
+    if (expanded) document.getElementById('notes').scrollIntoView({ behavior: 'smooth' });
+    btn.classList.toggle('expanded', !expanded);
+    btn.innerHTML = expanded
+      ? 'Xem thêm <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+      : 'Thu gọn <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  }
+
+  function toggleTimeline() {
+    const hidden = document.querySelectorAll('.tl-hidden');
+    const btn = document.getElementById('tlMoreBtn');
+    const expanded = btn.classList.contains('expanded');
+    hidden.forEach(el => el.classList.toggle('tl-shown', !expanded));
+    btn.classList.toggle('expanded', !expanded);
+    btn.innerHTML = expanded
+      ? 'Xem thêm <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+      : 'Thu gọn <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    if (expanded) document.getElementById('timeline').scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function toggleMembers() {
+    const hidden = document.querySelectorAll('.hidden-member');
+    const btn = document.getElementById('xemThemBtn');
+    const isExpanded = btn.classList.contains('expanded');
+    hidden.forEach(el => el.classList.toggle('shown', !isExpanded));
+    btn.classList.toggle('expanded', !isExpanded);
+    btn.innerHTML = isExpanded
+      ? 'Xem thêm <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+      : 'Thu gọn <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  }
+
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      const target = document.querySelector(a.getAttribute('href'));
+      if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth' }); }
+    });
+  });
+</script>
+
+<!-- MUSIC PLAYER -->
+<div id="mpOverlay" onclick="mpClose()" style="display:none;position:fixed;inset:0;z-index:998;background:rgba(0,0,0,0.4);backdrop-filter:blur(4px);align-items:center;justify-content:center;"></div>
+<div id="mpModal" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0.95);z-index:999;width:400px;max-width:94vw;background:#fff;border-radius:22px;box-shadow:0 32px 80px rgba(0,0,0,0.32);overflow:hidden;transition:transform 0.25s ease,opacity 0.25s ease;opacity:0;">
+  <div style="padding:1.4rem 1.4rem 1rem;display:flex;align-items:center;gap:14px;border-bottom:1px solid #f0f0f0;position:relative;">
+    <div id="mpThumb" style="width:68px;height:68px;border-radius:50%;background:linear-gradient(135deg,#7b68ee,#5bc0de);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:2rem;box-shadow:0 4px 16px rgba(0,0,0,0.18);animation:mpSpin 4s linear infinite;animation-play-state:paused;"></div>
+    <div style="flex:1;min-width:0;">
+      <div id="mpTitle" style="font-size:1rem;font-weight:700;color:#1a1a1a;margin-bottom:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">-</div>
+      <div style="display:flex;gap:10px;align-items:center;">
+        <button onclick="mpPrev()" class="mp-ctrl-btn" style="font-size:0.9rem;">&#9664;&#9664;</button>
+        <button onclick="mpToggle()" id="mpPlayBtn" class="mp-ctrl-btn mp-play-btn">&#9654;</button>
+        <button onclick="mpNext()" class="mp-ctrl-btn" style="font-size:0.9rem;">&#9654;&#9654;</button>
+      </div>
+    </div>
+    <button onclick="mpClose()" style="background:none;border:none;cursor:pointer;color:#bbb;font-size:1.2rem;padding:4px;align-self:flex-start;transition:color 0.2s;position:absolute;top:14px;right:14px;" onmouseover="this.style.color='#555'" onmouseout="this.style.color='#bbb'">&#10005;</button>
+  </div>
+  <ul id="mpList" style="list-style:none;padding:0.6rem;margin:0;max-height:300px;overflow-y:auto;"></ul>
+</div>
+<audio id="mpAudio"></audio>
+<style>
+  @keyframes mpSpin { to { transform:rotate(360deg); } }
+  #mpThumb { animation: mpSpin 4s linear infinite; animation-play-state: paused; transition: box-shadow 0.3s; }
+  #mpThumb.spinning { animation-play-state: running; box-shadow: 0 0 0 4px rgba(107,125,179,0.25), 0 4px 20px rgba(0,0,0,0.2); }
+  .mp-ctrl-btn { background:none;border:none;cursor:pointer;color:#555;font-size:0.85rem;padding:4px 6px;transition:color 0.2s,transform 0.15s;border-radius:50%; }
+  .mp-ctrl-btn:hover { color:#111;transform:scale(1.15); }
+  .mp-play-btn { width:32px;height:32px;background:rgba(0,0,0,0.08) !important;display:flex;align-items:center;justify-content:center; }
+  #mpList::-webkit-scrollbar { width:4px; }
+  #mpList::-webkit-scrollbar-thumb { background:#e0e0e0;border-radius:2px; }
+  .mp-item { display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:12px;cursor:pointer;transition:background 0.18s;margin-bottom:3px; }
+  .mp-item:hover { background:#f4f4f8; }
+  .mp-item.active { background:#6b7db3; }
+  .mp-item.active .mp-item-name { color:#fff; }
+  .mp-item-thumb { width:48px;height:48px;border-radius:10px;flex-shrink:0;overflow:hidden;background:linear-gradient(135deg,#7b68ee,#5bc0de);display:flex;align-items:center;justify-content:center;font-size:1.3rem; }
+  .mp-item-thumb img { width:100%;height:100%;object-fit:cover; }
+  .mp-item-name { font-size:0.9rem;font-weight:600;color:#1a1a1a; }
+</style>
+<script>
+  const mpTracks = [
+    { title:"Tháng Năm Không Quên", src:"thang_nam_khong_quen.mp3", thumb:"https://img.youtube.com/vi/L4xFcPuCZxI/mqdefault.jpg" },
+    { title:"Năm Tháng Trôi Qua", src:"nam_thang_troi_qua.mp3", thumb:"https://img.youtube.com/vi/dK_N0Pp1xmw/mqdefault.jpg" },
+    { title:"Nhớ Mãi Chuyến Đi Này", src:"", thumb:"https://img.youtube.com/vi/FJt7gNi3Nr4/mqdefault.jpg" },
+    { title:"Không Yêu Cũng Chẳng Cô Đơn", src:"", thumb:"https://img.youtube.com/vi/9bZkp7q19f0/mqdefault.jpg" },
+    { title:"Mùa Hè Của Peppa", src:"", thumb:"https://img.youtube.com/vi/U5vKx3PwS0Q/mqdefault.jpg" },
+    { title:"Nơi Pháo Hoa Rực Rỡ", src:"", thumb:"https://img.youtube.com/vi/CevxZvSJLk8/mqdefault.jpg" },
+  ];
+  let mpIdx = 0, mpIsPlaying = false;
+  const mpAudio = document.getElementById('mpAudio');
+  const mpListEl = document.getElementById('mpList');
+  mpTracks.forEach((t, i) => {
+    const li = document.createElement('li');
+    li.className = 'mp-item' + (i===0?' active':'');
+    li.innerHTML = `<div class="mp-item-thumb">${t.thumb ? `<img src="${t.thumb}" onerror="this.parentNode.textContent='🎵'">` : '🎵'}</div><span class="mp-item-name">${t.title}</span>`;
+    li.onclick = () => mpLoad(i);
+    mpListEl.appendChild(li);
+  });
+  function mpRender() {
+    const t = mpTracks[mpIdx];
+    document.getElementById('mpTitle').textContent = t.title;
+    const thumb = document.getElementById('mpThumb');
+    if (t.thumb) { thumb.style.backgroundImage = `url(${t.thumb})`; thumb.style.backgroundSize = 'cover'; thumb.style.backgroundPosition = 'center'; thumb.textContent = ''; }
+    else { thumb.style.backgroundImage = ''; thumb.textContent = '🎵'; }
+    document.getElementById('mpPlayBtn').innerHTML = mpIsPlaying ? '&#9646;&#9646;' : '&#9654;';
+    thumb.classList.toggle('spinning', mpIsPlaying);
+    document.querySelectorAll('.mp-item').forEach((el, i) => el.classList.toggle('active', i === mpIdx));
+  }
+  function mpLoad(i) {
+    mpIdx = i; const t = mpTracks[i]; mpAudio.pause(); mpAudio.currentTime = 0;
+    if (t.src) { mpAudio.src = t.src; mpAudio.load(); const p = mpAudio.play(); if (p) p.then(() => { mpIsPlaying = true; mpRender(); }).catch(() => { mpIsPlaying = false; mpRender(); }); }
+    else { mpIsPlaying = false; mpRender(); }
+  }
+  function mpToggle() { const t = mpTracks[mpIdx]; if (!t.src) return; if (mpIsPlaying) { mpAudio.pause(); mpIsPlaying = false; } else { mpAudio.play(); mpIsPlaying = true; } mpRender(); }
+  function mpPrev() { mpIdx = (mpIdx-1+mpTracks.length)%mpTracks.length; mpLoad(mpIdx); }
+  function mpNext() { mpIdx = (mpIdx+1)%mpTracks.length; mpLoad(mpIdx); }
+  mpAudio.addEventListener('ended', mpNext);
+  function mpOpen() {
+    const modal = document.getElementById('mpModal'), overlay = document.getElementById('mpOverlay');
+    modal.style.display = 'block'; overlay.style.display = 'block';
+    setTimeout(() => { modal.style.transform = 'translate(-50%,-50%) scale(1)'; modal.style.opacity = '1'; }, 10);
+    mpRender();
+  }
+  function mpClose() {
+    const modal = document.getElementById('mpModal'), overlay = document.getElementById('mpOverlay');
+    modal.style.transform = 'translate(-50%,-50%) scale(0.95)'; modal.style.opacity = '0';
+    setTimeout(() => { modal.style.display = 'none'; overlay.style.display = 'none'; }, 250);
+  }
+  mpRender();
+</script>
+</body>
+</html>
